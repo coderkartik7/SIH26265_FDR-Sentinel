@@ -1,0 +1,155 @@
+# FDR-Sentinel Configuration Rules
+# Problem Statement: SIH26265 - Security Deposit / FDR Portal, AICTE
+# Note: All institutions and banks are fictional for privacy & synthetic demo compliance.
+
+version: "1.0"
+
+system:
+  app_name: "FDR-Sentinel"
+  synthetic_banner: "Synthetic demo data. No real bank or AICTE data."
+  seed: 42
+  default_currency: "INR"
+
+interest_calculation:
+  compounding_frequency: 4  # Quarterly compounding default
+  formula_description: "maturity = P * (1 + r/4)^(4t)"
+  tolerance_percent: 2.0     # 2% rounding and bank convention discrepancy margin
+
+alert_intervals_days: [90, 60, 30, 15, 7]
+escalation:
+  unacknowledged_days_senior: 7
+  high_risk_priority_escalation: true
+
+risk_model:
+  high_risk_threshold: 70
+  medium_risk_threshold: 40
+  feature_weights:
+    anomaly_score: 0.25
+    flag_severity_weighted: 0.30
+    days_to_maturity: 0.15
+    institution_history: 0.15
+    amount_deviation: 0.15
+
+duplicate_radar:
+  fuzzy_ratio_threshold: 85       # pg_trgm / rapidfuzz match
+  phash_max_distance: 10          # imagehash pHash max Hamming distance
+  match_types:
+    - "EXACT_FINGERPRINT"         # SHA256(bank + fdr_number + amount + issue_date)
+    - "CROSS_INSTITUTION_REUSE"   # Same FDR claimed by two institutions
+    - "POST_RELEASE_REPRESENT"    # FDR resubmitted after release approval
+    - "VISUAL_PERCEPTUAL_PHASH"   # Rendered first-page perceptual duplicate
+
+release_eligibility:
+  checklist:
+    - id: "CHECK_TRUST_L4"
+      description: "FDR must be sealed at Trust Ladder L4"
+      required: true
+    - id: "CHECK_MATURITY"
+      description: "FDR must have reached or passed maturity date"
+      required: true
+    - id: "CHECK_NO_BLOCKING_FLAGS"
+      description: "Zero unresolved high-severity forensic anomalies"
+      required: true
+    - id: "CHECK_NO_DUPLICATE_DISPUTE"
+      description: "No active cross-institution duplicate radar flags"
+      required: true
+    - id: "CHECK_BOARD_APPROVAL"
+      description: "Competent AICTE approval signed on file"
+      required: true
+
+fictional_banks:
+  - id: "ACT"
+    name: "Apex Commercial Trust"
+    short_code: "ACT"
+    pattern: "^ACT-FD-[A-Z]{2}-\\d{6}$"
+    pattern_example: "ACT-FD-DL-104928"
+    branch_locations: ["Delhi-Connaught", "Noida-Sec62", "Chandigarh-Sec17"]
+    ifsc_prefix: "ACTR0"
+    base_interest_rate_range: [6.5, 7.5]
+    compounding_frequency: 4
+  - id: "BNB"
+    name: "Bharosa National Bank"
+    short_code: "BNB"
+    pattern: "^BNB-\\d{4}-[A-Z]{3}-\\d{5}$"
+    pattern_example: "BNB-2024-NDL-59201"
+    branch_locations: ["New Delhi-Barakhamba", "Lucknow-Hazratganj", "Jaipur-MI Road"]
+    ifsc_prefix: "BNBA0"
+    base_interest_rate_range: [6.8, 7.8]
+    compounding_frequency: 4
+  - id: "CRUB"
+    name: "Citadel Rural & Urban Bank"
+    short_code: "CRUB"
+    pattern: "^CRUB\\d{9}[A-Z]$"
+    pattern_example: "CRUB100482910X"
+    branch_locations: ["Pune-FC Road", "Ahmedabad-SG Highway", "Nagpur-Civil Lines"]
+    ifsc_prefix: "CRUB0"
+    base_interest_rate_range: [7.0, 8.1]
+    compounding_frequency: 4
+  - id: "DMB"
+    name: "Deccan Mercantile Bank"
+    short_code: "DMB"
+    pattern: "^DMB-[0-9]{3}-[A-Z]{2}-[0-9]{6}$"
+    pattern_example: "DMB-401-MH-827361"
+    branch_locations: ["Mumbai-Nariman Point", "Bengaluru-MG Road", "Hyderabad-Banjara Hills"]
+    ifsc_prefix: "DMCB0"
+    base_interest_rate_range: [6.6, 7.6]
+    compounding_frequency: 4
+  - id: "ETCB"
+    name: "EverTrust Co-operative Bank"
+    short_code: "ETCB"
+    pattern: "^ETCB-DEP-\\d{8}$"
+    pattern_example: "ETCB-DEP-49201847"
+    branch_locations: ["Chennai-Anna Nagar", "Kochi-MG Road", "Coimbatore-RS Puram"]
+    ifsc_prefix: "ETCB0"
+    base_interest_rate_range: [7.2, 8.4]
+    compounding_frequency: 4
+
+fictional_institutions:
+  - id: "INST-001"
+    name: "Zenith Institute of Technology"
+    code: "ZIT-N01"
+    region: "Northern"
+    city: "Greater Noida"
+    state: "Uttar Pradesh"
+  - id: "INST-002"
+    name: "Kaveri Valley Engineering College"
+    code: "KVEC-S02"
+    region: "Southern"
+    city: "Mysuru"
+    state: "Karnataka"
+  - id: "INST-003"
+    name: "Sahyadri Academy of Applied Sciences"
+    code: "SAAS-W03"
+    region: "Western"
+    city: "Pune"
+    state: "Maharashtra"
+  - id: "INST-004"
+    name: "Vindhya Polytechnic Institute"
+    code: "VPI-N04"
+    region: "Northern"
+    city: "Bhopal"
+    state: "Madhya Pradesh"
+  - id: "INST-005"
+    name: "Nilgiri School of Architecture & Design"
+    code: "NSAD-S05"
+    region: "Southern"
+    city: "Coimbatore"
+    state: "Tamil Nadu"
+  - id: "INST-006"
+    name: "Konkan Institute of Management & Research"
+    code: "KIMR-W06"
+    region: "Western"
+    city: "Panaji"
+    state: "Goa"
+  - id: "INST-007"
+    name: "Saraswati Technological University Campus"
+    code: "STUC-N07"
+    region: "Northern"
+    city: "Roorkee"
+    state: "Uttarakhand"
+  - id: "INST-008"
+    name: "Malabar College of Pharmaceutical Studies"
+    code: "MCPS-S08"
+    region: "Southern"
+    city: "Kozhikode"
+    state: "Kerala"

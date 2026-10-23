@@ -1,0 +1,67 @@
+{
+  "app": {
+    "title": "AICTE FDR-Sentinel",
+    "subtitle": "Autonomous Security Deposit Verification & Fraud Prevention Portal",
+    "phase1_badge": "SIH 2026 Prototype",
+    "simulated_badge": "SIMULATED ISSUER",
+    "real_crypto_badge": "REAL ED25519 CRYPTO",
+    "real_sig_badge": "REAL PYHANKO PKI"
+  },
+  "nav": {
+    "dashboard": "Official Dashboard",
+    "institution_portal": "Institution Portal",
+    "monitoring": "Maturity & Alerts",
+    "audit_chain": "Cryptographic Audit",
+    "ask_sentinel": "Ask-Sentinel NLP",
+    "verify_receipt": "Verify Sealed Receipt",
+    "logout": "Sign Out"
+  },
+  "auth": {
+    "login_title": "Portal Authentication",
+    "login_subtitle": "Sign in to access AICTE security deposit verification",
+    "email": "Email Address",
+    "password": "Password",
+    "totp_code": "6-digit TOTP Code (if enabled)",
+    "login_btn": "Sign In to Portal",
+    "mfa_modal_title": "Setup Two-Factor Authentication",
+    "scan_qr": "Scan this QR code with Google Authenticator or 1Password:",
+    "enter_totp": "Enter 6-digit confirmation code:",
+    "confirm_mfa": "Verify and Enable MFA"
+  },
+  "dashboard": {
+    "active_fdrs": "Active FDRs",
+    "total_liability": "Total Deposit Volume",
+    "flagged_anomalies": "Anomalies for Review",
+    "sealed_count": "L4 Sealed Deposits",
+    "filter_bank": "Filter Bank",
+    "filter_trust": "Trust Level",
+    "filter_status": "Status",
+    "search_placeholder": "Search FDR Number, Case ID, Bank...",
+    "forecast_title": "24-Month Maturing Deposit Forecast by Trust Level",
+    "clock_title": "Demonstration Time Jump"
+  },
+  "fdr_detail": {
+    "case_dossier": "FDR Security Deposit Dossier",
+    "extracted_fields": "Intake & OCR Extracted Fields",
+    "confidence": "Confidence",
+    "manual_review_needed": "Manual Review Flagged",
+    "correct_field": "Correct Value",
+    "forensics_tab": "Forensic Inspection Suites",
+    "duplicate_tab": "Duplicate Radar",
+    "trust_ladder": "Trust Ladder Progression",
+    "risk_meter": "AI Risk Scoring (GBDT + SHAP)",
+    "official_actions": "Official Decisions (Honesty Rule 5)",
+    "approve_seal": "Seal & Approve (L4)",
+    "reject": "Reject Case",
+    "view_ela": "View ELA Heatmap",
+    "view_doc": "Original Document"
+  },
+  "institution": {
+    "upload_title": "Submit New Fixed Deposit Receipt",
+    "upload_desc": "Upload digital PDF or high-resolution scan. Supports signed certificates.",
+    "select_file": "Select FDR Document (PDF / PNG / JPG)",
+    "uploading": "Encrypting & Inspecting...",
+    "my_deposits": "My Institution Deposits",
+    "request_release": "Request Release / Refund"
+  }
+}

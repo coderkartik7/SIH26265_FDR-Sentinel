@@ -1,0 +1,176 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: fdr_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: sentinel_user
+      POSTGRES_PASSWORD: sentinel_pass
+      POSTGRES_DB: fdr_sentinel
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U sentinel_user -d fdr_sentinel" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: fdr_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: pgsty/silo:latest
+    container_name: fdr_minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: sentinel_minio_admin
+      MINIO_ROOT_PASSWORD: sentinel_minio_secret_key_2026
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio-init:
+    image: pgsty/mc:latest
+    container_name: fdr_minio_init
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "mc alias set myminio http://minio:9000 sentinel_minio_admin sentinel_minio_secret_key_2026; mc mb --ignore-existing myminio/fdr-documents; mc anonymous set download myminio/fdr-documents; exit 0;"
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: fdr_mailhog
+    restart: unless-stopped
+    ports:
+      - "1025:1025" # SMTP port
+      - "8025:8025" # Web UI port
+
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: fdr_api
+    restart: unless-stopped
+    environment:
+      - ENVIRONMENT=production
+      - DATABASE_URL=postgresql+psycopg2://sentinel_user:sentinel_pass@postgres:5432/fdr_sentinel
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ACCESS_KEY=sentinel_minio_admin
+      - MINIO_SECRET_KEY=sentinel_minio_secret_key_2026
+      - MINIO_BUCKET_NAME=fdr-documents
+      - MINIO_SECURE=false
+      - SMTP_HOST=mailhog
+      - SMTP_PORT=1025
+      - SECRET_KEY=dev_insecure_jwt_secret_key_sih2026_fdr_sentinel_0987654321
+      - AES_MASTER_KEY_HEX=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./config:/app/config:ro
+      - ./eval/results:/app/eval/results
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+
+  worker:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: fdr_worker
+    restart: unless-stopped
+    command: celery -A app.workers.celery_app worker --loglevel=info -c 2
+    environment:
+      - ENVIRONMENT=production
+      - DATABASE_URL=postgresql+psycopg2://sentinel_user:sentinel_pass@postgres:5432/fdr_sentinel
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ACCESS_KEY=sentinel_minio_admin
+      - MINIO_SECRET_KEY=sentinel_minio_secret_key_2026
+      - MINIO_BUCKET_NAME=fdr-documents
+      - MINIO_SECURE=false
+      - SMTP_HOST=mailhog
+      - SMTP_PORT=1025
+      - SECRET_KEY=dev_insecure_jwt_secret_key_sih2026_fdr_sentinel_0987654321
+      - AES_MASTER_KEY_HEX=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+    volumes:
+      - ./config:/app/config:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  beat:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: fdr_beat
+    restart: unless-stopped
+    command: celery -A app.workers.celery_app beat --loglevel=info
+    environment:
+      - ENVIRONMENT=production
+      - DATABASE_URL=postgresql+psycopg2://sentinel_user:sentinel_pass@postgres:5432/fdr_sentinel
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: fdr_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+
+  clamav:
+    image: clamav/clamav:latest
+    container_name: fdr_clamav
+    profiles:
+      - clamav
+    ports:
+      - "3310:3310"
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:

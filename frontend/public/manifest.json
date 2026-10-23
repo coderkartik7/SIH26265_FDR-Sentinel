@@ -1,0 +1,15 @@
+{
+  "short_name": "FDR-Sentinel",
+  "name": "AICTE FDR-Sentinel Portal",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#0b1d3a",
+  "theme_color": "#0b1d3a",
+  "display": "standalone"
+}

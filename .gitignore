@@ -1,0 +1,114 @@
+# ==========================================
+# Operating System & Environment
+# ==========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.swp
+*.swo
+*.tmp
+*.bak
+
+# ==========================================
+# Environment Variables & Secrets
+# ==========================================
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.p12
+
+# ==========================================
+# Node / React / TypeScript Frontend
+# ==========================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-debug.log*
+dist/
+build/
+.next/
+.out/
+.cache/
+.vite/
+
+# ==========================================
+# Python / FastAPI Backend & Forensics Engine
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.nox/
+.hypothesis/
+
+# ==========================================
+# Machine Learning & OCR Models / Weights
+# ==========================================
+# Exclude model weights, registry artifacts, and local datasets
+*.onnx
+*.pt
+*.pkl
+*.pth
+*.h5
+*.bin
+models_registry/
+dataset/
+synthetic_data/
+*.paddle/
+
+# ==========================================
+# Uploads, Storage & Temporary Files (MinIO / Local Storage)
+# ==========================================
+uploads/
+storage/
+temp/
+media/
+*.pdf
+*.png
+*.jpg
+*.jpeg
+*.tiff
+
+# ==========================================
+# IDEs & Code Editors
+# ==========================================
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.iws
+*.iml
+
+# ==========================================
+# Docker & Local Databases / Cache
+# ==========================================
+pgdata/
+minio_data/
+dump.rdb
+redis.conf
+celerybeat-schedule
+celerybeat.pid

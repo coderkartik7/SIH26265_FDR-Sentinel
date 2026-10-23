@@ -1,0 +1,32 @@
+{
+  "model_type": "GradientBoostingClassifier",
+  "version": "GBDT-v1.0",
+  "dataset_samples": 150,
+  "train_samples": 120,
+  "test_samples": 30,
+  "accuracy": 1.0,
+  "precision": 1.0,
+  "recall": 1.0,
+  "f1_score": 1.0,
+  "roc_auc": 1.0,
+  "confusion_matrix": [
+    [
+      22,
+      0
+    ],
+    [
+      0,
+      8
+    ]
+  ],
+  "feature_importances": {
+    "days_to_maturity": 0.0,
+    "trust_level_num": 0.1539,
+    "high_flags_count": 0.3352,
+    "med_flags_count": 0.0,
+    "anomaly_score": 0.5109,
+    "duplicate_flag": 0.0,
+    "principal_lakhs": 0.0,
+    "rate_deviation": 0.0
+  }
+}
