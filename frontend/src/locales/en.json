@@ -58,7 +58,6 @@
   },
   "institution": {
     "upload_title": "Submit New Fixed Deposit Receipt",
-    "upload_desc": "Upload digital PDF or high-resolution scan. Supports signed certificates.",
     "select_file": "Select FDR Document (PDF / PNG / JPG)",
     "uploading": "Encrypting & Inspecting...",
     "my_deposits": "My Institution Deposits",

@@ -45,12 +45,12 @@ export const AskSentinelModal: React.FC<AskSentinelModalProps> = ({ isOpen, onCl
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-surface/80">
       <div className="w-full max-w-4xl max-h-[90vh] glass-panel rounded-2xl border border-sentinel-500/40 p-6 shadow-2xl flex flex-col relative overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-slate-800">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-gradient-to-tr from-sentinel-600 to-indigo-600 text-white shadow-lg">
+            <div className="p-2.5 rounded-lg bg-soft text-accent">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>

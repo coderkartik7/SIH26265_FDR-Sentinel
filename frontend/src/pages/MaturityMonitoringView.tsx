@@ -178,7 +178,7 @@ export const MaturityMonitoringView: React.FC<MaturityMonitoringViewProps> = ({ 
                       {!a.is_acknowledged && (
                         <button
                           onClick={() => handleAcknowledgeAlert(a.id)}
-                          className="px-2.5 py-1 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-[11px] font-semibold transition-all"
+                          className="status-badge whitespace-nowrap shrink-0 px-2.5 py-1 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-[11px] font-semibold transition-all"
                         >
                           Acknowledge
                         </button>

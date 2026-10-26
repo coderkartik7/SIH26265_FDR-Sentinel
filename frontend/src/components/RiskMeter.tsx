@@ -10,8 +10,8 @@ interface RiskMeterProps {
 export const RiskMeter: React.FC<RiskMeterProps> = ({ riskScore, className = '' }) => {
   if (!riskScore) {
     return (
-      <div className={`p-4 glass-card rounded-xl text-center text-slate-400 text-sm ${className}`}>
-        No risk assessment available.
+      <div className={`p-4 glass-card rounded-lg text-left text-muted text-[15px] ${className}`}>
+        Risk score pending
       </div>
     );
   }
@@ -65,8 +65,8 @@ export const RiskMeter: React.FC<RiskMeterProps> = ({ riskScore, className = '' 
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-sentinel-400" />
-          <h3 className="font-semibold text-slate-100 text-sm tracking-wide">
-            Predictive Risk Assessment (GBDT)
+          <h3 className="font-semibold text-slate-100 text-[15px]">
+            Risk assessment
           </h3>
         </div>
         <span className={`px-2.5 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 ${style.bg}`}>
@@ -94,8 +94,8 @@ export const RiskMeter: React.FC<RiskMeterProps> = ({ riskScore, className = '' 
       {/* SHAP Explainability Chips */}
       {reasons.length > 0 && (
         <div className="mt-4 pt-3 border-t border-slate-800">
-          <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-            Top Model Explainability Factors (SHAP Analysis):
+          <h4 className="text-[15px] font-semibold text-slate-400 mb-2">
+            Key risk factors
           </h4>
           <div className="space-y-2">
             {reasons.map((reason: any, idx: number) => {

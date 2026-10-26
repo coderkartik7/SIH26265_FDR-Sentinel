@@ -27,7 +27,7 @@ import { FDRCase, ExtractedField, ForensicFinding, DuplicateMatch, VerificationR
 import { TrustLadderStepper } from '../components/TrustLadderStepper';
 import { RiskMeter } from '../components/RiskMeter';
 import { SimulatedBadge, RealCryptoBadge, RealSignatureBadge } from '../components/SimulatedBadge';
-import { ELAModal } from '../components/ELAModal';
+import { ELAModal, AuthImage } from '../components/ELAModal';
 
 export const FDRDetailView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -157,15 +157,14 @@ export const FDRDetailView: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Back button & Breadcrumb */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center">
         <Link
           to={normalizedRole === 'INSTITUTION' ? '/institution' : '/dashboard'}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-colors"
+          className="inline-flex items-center gap-1.5 text-[15px] font-semibold text-muted hover:text-ink"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Overview</span>
         </Link>
-        <span className="text-xs font-mono text-slate-500">Case ID: {fdrCase.id}</span>
       </div>
 
       {actionSuccessMsg && (
@@ -180,18 +179,16 @@ export const FDRDetailView: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-extrabold text-white tracking-tight font-mono">
+              <h1 className="text-xl font-semibold text-ink font-mono truncate" title={fdrCase.case_number}>
                 {fdrCase.case_number}
               </h1>
               <span
-                className={`px-3 py-1 rounded-full text-xs font-bold border ${
+                className={`px-3 py-1 rounded-lg text-[15px] font-semibold border ${
                   fdrCase.status === 'VERIFIED'
-                    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+                    ? 'bg-surface border-soft text-ok'
                     : fdrCase.status === 'FLAGGED'
-                    ? 'bg-rose-500/10 border-rose-500/30 text-rose-300'
-                    : fdrCase.status === 'RELEASED'
-                    ? 'bg-purple-500/10 border-purple-500/30 text-purple-300'
-                    : 'bg-slate-800 border-slate-700 text-slate-300'
+                    ? 'flag-row'
+                    : 'bg-surface border-soft text-ink'
                 }`}
               >
                 {fdrCase.status}
@@ -207,7 +204,7 @@ export const FDRDetailView: React.FC = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowELAModal(true)}
-              className="px-3 py-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm"
+              className="btn-primary px-3 py-2 text-[15px] flex items-center gap-1.5"
             >
               <Eye className="w-3.5 h-3.5" />
               <span>{t('fdr_detail.view_ela')}</span>
@@ -216,7 +213,7 @@ export const FDRDetailView: React.FC = () => {
               href={`/api/v1/fdr/cases/${fdrCase.id}/document`}
               target="_blank"
               rel="noreferrer"
-              className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-all"
+              className="btn-ghost px-3 py-2 flex items-center gap-1.5"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Download PDF</span>
@@ -237,32 +234,32 @@ export const FDRDetailView: React.FC = () => {
           {/* Document Preview Card */}
           <div className="glass-panel p-5 rounded-2xl border border-slate-800 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                Document Preview (Page 1)
+              <span className="text-[15px] font-semibold text-ink">
+                Document preview
               </span>
               <button
                 onClick={() => setShowELAModal(true)}
-                className="text-[11px] font-bold text-rose-400 hover:text-rose-300 flex items-center gap-1"
+                className="text-[15px] font-semibold text-accent-text flex items-center gap-1"
               >
-                <Layers className="w-3 h-3" /> ELA Heatmap
+                <Layers className="w-4 h-4" /> ELA heatmap
               </button>
             </div>
-            <div className="rounded-xl overflow-hidden border border-slate-800 bg-slate-950 flex items-center justify-center p-2 min-h-[350px]">
-              <img
-                src={`/api/v1/fdr/cases/${fdrCase.id}/preview`}
-                alt="FDR Preview"
-                className="max-h-[460px] w-auto object-contain rounded-lg shadow-lg hover:scale-[1.02] transition-transform cursor-pointer"
+            <div className="aspect-[3/4] w-full rounded-lg border border-soft bg-surface flex items-center justify-center p-2">
+              <AuthImage
+                path={`/fdr/cases/${fdrCase.id}/preview`}
+                alt="FDR preview"
+                className="max-h-full max-w-full object-contain cursor-pointer"
                 onClick={() => setShowELAModal(true)}
               />
             </div>
           </div>
 
           {/* AI Risk Meter (GBDT + SHAP) */}
-          <RiskMeter riskScore={latestRisk} />
+          {latestRisk && <RiskMeter riskScore={latestRisk} />}
 
           {/* Duplicate Radar Match (If flagged) */}
           {duplicateMatches.length > 0 && (
-            <div className="glass-panel p-5 rounded-2xl border border-rose-500/40 bg-rose-500/5 space-y-3">
+            <div className="glass-panel p-5 flag-row space-y-3">
               <div className="flex items-center gap-2 text-rose-400 font-bold text-sm">
                 <Fingerprint className="w-5 h-5" />
                 <span>Duplicate Radar Detection</span>
@@ -303,7 +300,6 @@ export const FDRDetailView: React.FC = () => {
                 <FileText className="w-4 h-4 text-sentinel-400" />
                 <h3 className="font-bold text-slate-100 text-sm">{t('fdr_detail.extracted_fields')}</h3>
               </div>
-              <span className="text-[10px] text-slate-400">OCR Confidence &bull; Manual Review</span>
             </div>
 
             <div className="space-y-2">
@@ -319,57 +315,46 @@ export const FDRDetailView: React.FC = () => {
                 return (
                   <div
                     key={field.id}
-                    className={`p-3 rounded-xl border transition-colors flex items-center justify-between gap-3 ${
-                      isLowConf
-                        ? 'bg-amber-500/5 border-amber-500/30'
-                        : 'bg-slate-900/60 border-slate-800'
+                    className={`p-3 rounded-lg grid grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)_auto] gap-3 items-start ${
+                      isLowConf ? 'flag-row' : 'border border-soft bg-surface'
                     }`}
                   >
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                          {fieldName}
-                        </span>
-                        <span
-                          className={`text-[10px] font-mono px-1.5 py-0.2 rounded font-bold ${
-                            isLowConf
-                              ? 'bg-amber-500/20 text-amber-300'
-                              : 'bg-emerald-500/20 text-emerald-300'
-                          }`}
-                        >
-                          {(conf * 100).toFixed(0)}% Conf
-                        </span>
-                        {field.manual_corrected_value && (
-                          <span className="text-[10px] font-bold text-cyan-400 bg-cyan-500/10 px-1.5 py-0.2 rounded">
-                            Corrected
-                          </span>
-                        )}
-                      </div>
+                    <div className="min-w-0">
+                      <span className="text-[15px] font-semibold text-ink line-clamp-2" title={fieldName}>
+                        {fieldName}
+                      </span>
+                      <span
+                        className={`font-mono ${isLowConf ? 'text-accent-text' : 'text-ok'}`}
+                      >
+                        {(conf * 100).toFixed(0)}%
+                      </span>
+                    </div>
 
+                    <div className="min-w-0">
                       {isEditing ? (
-                        <div className="flex items-center gap-2 mt-2">
+                        <div className="flex items-center gap-2">
                           <input
                             type="text"
                             value={editingValue}
                             onChange={(e) => setEditingValue(e.target.value)}
-                            className="flex-1 px-2.5 py-1 text-xs rounded bg-slate-800 border border-sentinel-500 text-slate-100 font-mono"
+                            className="flex-1 min-w-0 px-2.5 py-1 text-[15px] rounded bg-bg border border-border-strong text-ink"
                           />
                           <button
                             onClick={() => handleSaveField(field.id)}
                             disabled={savingField}
-                            className="p-1 rounded bg-emerald-600 text-white hover:bg-emerald-500"
+                            className="btn-primary p-1"
                           >
-                            <Check className="w-3.5 h-3.5" />
+                            <Check className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => setEditingFieldId(null)}
-                            className="p-1 rounded bg-slate-800 text-slate-400 hover:text-white"
+                            className="btn-ghost p-1"
                           >
-                            <X className="w-3.5 h-3.5" />
+                            <X className="w-4 h-4" />
                           </button>
                         </div>
                       ) : (
-                        <div className="text-sm font-bold text-slate-100 font-mono mt-0.5 truncate">
+                        <div className="text-[15px] text-ink line-clamp-2" title={String(val)}>
                           {val}
                         </div>
                       )}
@@ -381,10 +366,10 @@ export const FDRDetailView: React.FC = () => {
                           setEditingFieldId(field.id);
                           setEditingValue(val === 'N/A' ? '' : val);
                         }}
-                        className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors"
-                        title="Correct OCR Value"
+                        className="btn-ghost p-1.5"
+                        title="Correct value"
                       >
-                        <Edit3 className="w-3.5 h-3.5" />
+                        <Edit3 className="w-4 h-4" />
                       </button>
                     )}
                   </div>
@@ -400,7 +385,6 @@ export const FDRDetailView: React.FC = () => {
                 <Shield className="w-4 h-4 text-sentinel-400" />
                 <h3 className="font-bold text-slate-100 text-sm">{t('fdr_detail.forensics_tab')}</h3>
               </div>
-              <span className="text-[10px] text-slate-400">Rule 3: Labeled "anomaly for human review"</span>
             </div>
 
             <div className="space-y-2">
@@ -413,10 +397,8 @@ export const FDRDetailView: React.FC = () => {
                 return (
                   <div
                     key={finding.id}
-                    className={`p-3.5 rounded-xl border text-xs space-y-1.5 transition-colors ${
-                      isFlagged
-                        ? 'bg-rose-500/10 border-rose-500/30'
-                        : 'bg-slate-900/50 border-slate-800'
+                    className={`p-3.5 rounded-lg text-[15px] space-y-1.5 ${
+                      isFlagged ? 'flag-row' : 'bg-surface border border-soft'
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -458,7 +440,7 @@ export const FDRDetailView: React.FC = () => {
               <button
                 onClick={handleRunConnectors}
                 disabled={verifyingConnectors || fdrCase.trust_level === 'L4_SEALED'}
-                className="px-3 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 text-white font-semibold text-xs flex items-center gap-1.5 transition-all shadow-sm"
+                className="btn-primary px-3 py-1.5 disabled:opacity-50 flex items-center gap-1.5"
               >
                 {verifyingConnectors ? (
                   <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -545,7 +527,7 @@ export const FDRDetailView: React.FC = () => {
                 <button
                   onClick={() => handleSealDecision('SEAL_APPROVE')}
                   disabled={sealingCase}
-                  className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-lg shadow-emerald-600/20"
+                  className="btn-primary flex-1 py-2.5 flex items-center justify-center gap-1.5"
                 >
                   <Lock className="w-3.5 h-3.5" />
                   <span>{t('fdr_detail.approve_seal')}</span>
@@ -553,7 +535,7 @@ export const FDRDetailView: React.FC = () => {
                 <button
                   onClick={() => handleSealDecision('REJECT')}
                   disabled={sealingCase}
-                  className="px-4 py-2.5 rounded-xl bg-rose-600/30 hover:bg-rose-600/50 text-rose-300 border border-rose-500/40 text-xs font-semibold flex items-center gap-1.5 transition-all"
+                  className="flag-row px-4 py-2.5 text-[15px] font-semibold flex items-center gap-1.5"
                 >
                   <X className="w-3.5 h-3.5" />
                   <span>{t('fdr_detail.reject')}</span>
@@ -605,7 +587,7 @@ export const FDRDetailView: React.FC = () => {
                     </span>
                     <p className="text-[11px] text-slate-400">{ev.reason || ev.notes || ev.trigger_type || 'Trust transition recorded'}</p>
                   </div>
-                  <span className="text-[10px] font-mono text-slate-500">
+                  <span className="font-mono text-muted shrink-0" title={ev.created_at || ''}>
                     {ev.created_at ? new Date(ev.created_at).toLocaleString() : ''}
                   </span>
                 </div>

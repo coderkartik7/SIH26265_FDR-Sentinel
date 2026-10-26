@@ -15,11 +15,13 @@ from app.services.audit_service import record_audit_event
 from app.forensics.preprocessor import pdf_bytes_to_images, preprocess_document_image
 from app.forensics.ocr_engine import extract_document_text
 from app.forensics.field_extractor import extract_structured_fields
+from app.core.config import BASE_DIR
 from app.forensics.checks import (
     check_financial_consistency,
     check_bank_fdr_pattern,
     check_pdf_digital_signature,
     compute_ela_heatmap,
+    render_ela_heatmap,
     inspect_pikepdf_metadata,
     check_qr_envelope_and_payload
 )
@@ -158,7 +160,11 @@ def process_fdr_document(
     if document.mime_type == "application/pdf":
         all_findings.append(check_pdf_digital_signature(doc_bytes))
 
-    # Check D1: ELA heatmap & mean error
+    # Check D1: ELA heatmap & mean error (store display PNG for the case preview)
+    derived_dir = BASE_DIR / "storage" / "derived"
+    derived_dir.mkdir(parents=True, exist_ok=True)
+    first_page.save(derived_dir / f"{document.id}_preview.png", format="PNG")
+    render_ela_heatmap(first_page).save(derived_dir / f"{document.id}_ela.png", format="PNG")
     _, ela_err = compute_ela_heatmap(processed_page)
     if ela_err > 18.0:
         all_findings.append({

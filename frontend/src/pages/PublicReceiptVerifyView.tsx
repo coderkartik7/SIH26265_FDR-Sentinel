@@ -52,7 +52,7 @@ export const PublicReceiptVerifyView: React.FC = () => {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
       {/* Header */}
       <div className="text-center space-y-3">
-        <div className="inline-flex p-3 rounded-2xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 mb-2">
+        <div className="receipt-verify-icon inline-flex p-3 rounded-2xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 mb-2">
           <QrCode className="w-10 h-10" />
         </div>
         <h1 className="text-3xl font-extrabold text-white tracking-tight">

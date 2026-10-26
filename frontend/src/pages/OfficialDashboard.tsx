@@ -4,7 +4,6 @@ import {
   ShieldAlert,
   ShieldCheck,
   TrendingUp,
-  AlertTriangle,
   FileCheck,
   Search,
   Filter,
@@ -93,14 +92,12 @@ export const OfficialDashboard: React.FC<OfficialDashboardProps> = ({ onOpenDemo
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 glass-panel p-6 rounded-2xl border border-slate-800 shadow-xl">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-extrabold text-white tracking-tight">AICTE Official Verification Hub</h1>
+            <h1 className="text-2xl font-semibold text-white">FDR verification dashboard</h1>
             <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-sentinel-500/20 text-sentinel-400 border border-sentinel-500/30">
               Live Monitoring
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
-            Real-time multi-tier forensics, duplicate radar, and cryptographic hash-chained audit verification.
-          </p>
+          <p className="text-[15px] text-slate-400 mt-1">Review deposits, alerts, and verification status.</p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -114,14 +111,14 @@ export const OfficialDashboard: React.FC<OfficialDashboardProps> = ({ onOpenDemo
           </button>
           <button
             onClick={onOpenDemoClock}
-            className="px-4 py-2.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-bold flex items-center gap-2 transition-all shadow-md"
+            className="btn-ghost px-4 py-2.5 flex items-center gap-2"
           >
-            <Clock className="w-4 h-4 animate-pulse-subtle" />
-            <span>Time Jump Controller</span>
+            <Clock className="w-4 h-4" />
+            <span>Demo clock</span>
           </button>
           <button
             onClick={onOpenAskSentinel}
-            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-sentinel-600 to-indigo-600 hover:from-sentinel-500 hover:to-indigo-500 text-white text-xs font-bold flex items-center gap-2 transition-all shadow-md shadow-sentinel-600/30"
+            className="btn-primary px-4 py-2.5 flex items-center gap-2"
           >
             <Sparkles className="w-4 h-4" />
             <span>Ask-Sentinel</span>
@@ -133,7 +130,7 @@ export const OfficialDashboard: React.FC<OfficialDashboardProps> = ({ onOpenDemo
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Active FDRs */}
         <div className="glass-card p-5 rounded-2xl border border-slate-800 flex items-center gap-4">
-          <div className="p-3 rounded-xl bg-sentinel-500/10 text-sentinel-400 border border-sentinel-500/20">
+          <div className="text-sentinel-400 shrink-0">
             <FileCheck className="w-6 h-6" />
           </div>
           <div>
@@ -149,7 +146,7 @@ export const OfficialDashboard: React.FC<OfficialDashboardProps> = ({ onOpenDemo
 
         {/* Total Deposit Volume */}
         <div className="glass-card p-5 rounded-2xl border border-slate-800 flex items-center gap-4">
-          <div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <div className="text-emerald-400 shrink-0">
             <TrendingUp className="w-6 h-6" />
           </div>
           <div>
@@ -167,7 +164,7 @@ export const OfficialDashboard: React.FC<OfficialDashboardProps> = ({ onOpenDemo
 
         {/* Anomalies for Review */}
         <div className="glass-card p-5 rounded-2xl border border-slate-800 flex items-center gap-4">
-          <div className="p-3 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20">
+          <div className="text-rose-400 shrink-0">
             <ShieldAlert className="w-6 h-6" />
           </div>
           <div>
@@ -183,7 +180,7 @@ export const OfficialDashboard: React.FC<OfficialDashboardProps> = ({ onOpenDemo
 
         {/* Sealed Count */}
         <div className="glass-card p-5 rounded-2xl border border-slate-800 flex items-center gap-4">
-          <div className="p-3 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+          <div className="text-cyan-400 shrink-0">
             <ShieldCheck className="w-6 h-6" />
           </div>
           <div>
@@ -219,28 +216,28 @@ export const OfficialDashboard: React.FC<OfficialDashboardProps> = ({ onOpenDemo
           <div className="h-72 w-full pt-2">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={forecast.timeline} margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="month" stroke="#64748b" tick={{ fontSize: 11 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#E8CFA6" />
+                <XAxis dataKey="month" stroke="#7A6F66" tick={{ fontSize: 11, fill: '#7A6F66' }} />
                 <YAxis
-                  stroke="#64748b"
-                  tick={{ fontSize: 11 }}
+                  stroke="#7A6F66"
+                  tick={{ fontSize: 11, fill: '#7A6F66' }}
                   tickFormatter={(val) => `₹${(val / 100000).toFixed(0)}L`}
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: '#0f172a',
-                    borderColor: '#334155',
-                    borderRadius: '12px',
+                    backgroundColor: '#FFF2DB',
+                    borderColor: '#E8CFA6',
+                    borderRadius: '8px',
                     fontSize: '12px',
-                    color: '#f8fafc',
+                    color: '#2A2420',
                   }}
                   formatter={(value: any) => [`₹${Number(value).toLocaleString('en-IN')}`, '']}
                 />
-                <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
-                <Bar dataKey="L4_SEALED" name="L4 Sealed" stackId="a" fill="#06b6d4" />
-                <Bar dataKey="L3_SOURCE_VERIFIED" name="L3 Source-Verified" stackId="a" fill="#10b981" />
-                <Bar dataKey="L2_MACHINE_CHECKED" name="L2 Machine-Checked" stackId="a" fill="#3b82f6" />
-                <Bar dataKey="L1_DECLARED" name="L1 Declared" stackId="a" fill="#64748b" />
+                <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px', color: '#2A2420' }} />
+                <Bar dataKey="L4_SEALED" name="L4 Sealed" stackId="a" fill="#2F7D5B" />
+                <Bar dataKey="L3_SOURCE_VERIFIED" name="L3 Source-Verified" stackId="a" fill="#D81B36" />
+                <Bar dataKey="L2_MACHINE_CHECKED" name="L2 Machine-Checked" stackId="a" fill="#F62440" />
+                <Bar dataKey="L1_DECLARED" name="L1 Declared" stackId="a" fill="#7A6F66" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -346,7 +343,7 @@ export const OfficialDashboard: React.FC<OfficialDashboardProps> = ({ onOpenDemo
                   <th className="py-3 px-4">Principal Amount</th>
                   <th className="py-3 px-4">Maturity Date</th>
                   <th className="py-3 px-4">Trust Level</th>
-                  <th className="py-3 px-4">Status & Anomaly Flags</th>
+                  <th className="py-3 px-4">Status</th>
                   <th className="py-3 px-4 text-right">Dossier</th>
                 </tr>
               </thead>
@@ -371,41 +368,12 @@ export const OfficialDashboard: React.FC<OfficialDashboardProps> = ({ onOpenDemo
                       {new Date(c.maturity_date).toLocaleDateString()}
                     </td>
                     <td className="py-3 px-4">
-                      <span
-                        className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                          c.trust_level === 'L4_SEALED'
-                            ? 'bg-cyan-500/10 text-cyan-300 border border-cyan-500/30'
-                            : c.trust_level === 'L3_SOURCE_VERIFIED'
-                            ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30'
-                            : c.trust_level === 'L2_MACHINE_CHECKED'
-                            ? 'bg-sentinel-500/10 text-sentinel-300 border border-sentinel-500/30'
-                            : 'bg-slate-700/50 text-slate-400 border border-slate-700'
-                        }`}
-                      >
-                        {c.trust_level}
+                      <span className="font-semibold text-slate-300">
+                        T{c.trust_level[1]}
                       </span>
                     </td>
                     <td className="py-3 px-4">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                            c.status === 'VERIFIED'
-                              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                              : c.status === 'FLAGGED'
-                              ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                              : 'bg-slate-700/50 text-slate-300'
-                          }`}
-                        >
-                          {c.status}
-                        </span>
-
-                        {c.unresolved_flags_count > 0 && (
-                          <span className="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/40 text-[10px] font-bold flex items-center gap-1">
-                            <AlertTriangle className="w-3 h-3" />
-                            {c.unresolved_flags_count} flagged
-                          </span>
-                        )}
-                      </div>
+                      <span className="font-semibold text-slate-300">{c.status}</span>
                     </td>
                     <td className="py-3 px-4 text-right">
                       <Link

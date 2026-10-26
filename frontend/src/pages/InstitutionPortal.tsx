@@ -102,9 +102,6 @@ export const InstitutionPortal: React.FC = () => {
               {user?.institution_id || 'AICTE Affiliated'}
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
-            Submit mandatory Fixed Deposit Receipts for affiliation, track verification stages, and manage security deposits.
-          </p>
         </div>
 
         <button
@@ -119,12 +116,11 @@ export const InstitutionPortal: React.FC = () => {
       {/* Upload FDR Section */}
       <div className="glass-panel p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl space-y-4">
         <div className="flex items-center gap-3">
-          <div className="p-3 rounded-xl bg-sentinel-500/10 text-sentinel-400 border border-sentinel-500/20">
+          <div className="text-sentinel-400">
             <UploadCloud className="w-6 h-6" />
           </div>
           <div>
             <h2 className="text-lg font-bold text-white">{t('institution.upload_title')}</h2>
-            <p className="text-xs text-slate-400">{t('institution.upload_desc')}</p>
           </div>
         </div>
 
@@ -151,7 +147,7 @@ export const InstitutionPortal: React.FC = () => {
             disabled={uploading}
             className="hidden"
           />
-          <div className="p-4 rounded-2xl bg-slate-800 group-hover:bg-sentinel-500/20 text-slate-400 group-hover:text-sentinel-300 transition-colors mb-3">
+          <div className="text-slate-400 group-hover:text-sentinel-300 transition-colors mb-3">
             <UploadCloud className="w-8 h-8" />
           </div>
           <span className="text-sm font-semibold text-slate-200">
@@ -206,18 +202,8 @@ export const InstitutionPortal: React.FC = () => {
                       {new Date(c.maturity_date).toLocaleDateString()}
                     </td>
                     <td className="py-3 px-4">
-                      <span
-                        className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                          c.trust_level === 'L4_SEALED'
-                            ? 'bg-cyan-500/10 text-cyan-300 border border-cyan-500/30'
-                            : c.trust_level === 'L3_SOURCE_VERIFIED'
-                            ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30'
-                            : c.trust_level === 'L2_MACHINE_CHECKED'
-                            ? 'bg-sentinel-500/10 text-sentinel-300 border border-sentinel-500/30'
-                            : 'bg-slate-700/50 text-slate-400 border border-slate-700'
-                        }`}
-                      >
-                        {c.trust_level}
+                      <span className="font-semibold text-slate-300">
+                        T{c.trust_level[1]}
                       </span>
                     </td>
                     <td className="py-3 px-4">

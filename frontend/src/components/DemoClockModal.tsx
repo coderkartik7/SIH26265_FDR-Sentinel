@@ -42,7 +42,7 @@ export const DemoClockModal: React.FC<DemoClockModalProps> = ({ isOpen, onClose,
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-surface/80">
       <div className="w-full max-w-lg glass-panel rounded-2xl border border-amber-500/30 p-6 shadow-2xl relative">
         <button
           onClick={onClose}

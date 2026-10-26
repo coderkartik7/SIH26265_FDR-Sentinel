@@ -112,3 +112,9 @@ dump.rdb
 redis.conf
 celerybeat-schedule
 celerybeat.pid
+
+# Local test databases
+test_sentinel*.db
+
+# Serialized model artifacts
+*.joblib

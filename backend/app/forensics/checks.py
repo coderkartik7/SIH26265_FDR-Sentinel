@@ -256,6 +256,17 @@ def check_pdf_digital_signature(pdf_bytes: bytes) -> Dict[str, Any]:
         }
 
 
+def render_ela_heatmap(pil_image: Image.Image, quality: int = 90, amplify: int = 15) -> Image.Image:
+    """Display ELA: JPEG q=90, pixel difference, brightness amplify x15."""
+    buffer = io.BytesIO()
+    rgb = pil_image.convert("RGB")
+    rgb.save(buffer, "JPEG", quality=quality)
+    buffer.seek(0)
+    resaved = Image.open(buffer).convert("RGB")
+    diff = ImageChops.difference(rgb, resaved)
+    return ImageEnhance.Brightness(diff).enhance(amplify)
+
+
 def compute_ela_heatmap(pil_image: Image.Image, quality: int = 90, scale: int = 12) -> Tuple[Image.Image, float]:
     """
     Check D1: Error Level Analysis (ELA)

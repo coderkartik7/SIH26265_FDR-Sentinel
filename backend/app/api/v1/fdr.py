@@ -17,9 +17,12 @@ from app.schemas.fdr import (
 from app.api.deps import get_current_user, require_roles
 from app.services.storage_service import store_encrypted_document, retrieve_and_decrypt_document
 from app.services.pipeline_service import process_fdr_document
+from app.core.config import BASE_DIR
 from app.forensics.preprocessor import pdf_bytes_to_images
-from app.forensics.checks import compute_ela_heatmap
+from app.forensics.checks import render_ela_heatmap
 from PIL import Image
+
+DERIVED_DIR = BASE_DIR / "storage" / "derived"
 
 router = APIRouter(prefix="/fdr", tags=["FDR Operations"])
 
@@ -196,36 +199,58 @@ def update_extracted_field(
     return field
 
 
-@router.get("/cases/{case_id}/ela-heatmap")
-def get_ela_heatmap_image(
-    case_id: str,
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
-):
-    """
-    Returns PNG image bytes of Error Level Analysis (ELA) heatmap for the FDR document
-    """
+def _case_document_or_404(case_id: str, current_user: User, db: Session) -> Document:
     case = db.query(FDRCase).filter(FDRCase.id == case_id).first()
     if not case or not case.versions:
-        raise HTTPException(status_code=404, detail="FDR Case or document version not found")
-
+        raise HTTPException(status_code=404, detail="FDR Case not found")
+    if current_user.role == UserRole.INSTITUTION and case.institution_id != current_user.institution_id:
+        raise HTTPException(status_code=403, detail="Forbidden")
     version = next((v for v in case.versions if v.id == case.current_version_id), case.versions[0])
     if not version.document:
-        raise HTTPException(status_code=404, detail="No document associated with version")
+        raise HTTPException(status_code=404, detail="No document found")
+    return version.document
 
-    doc_bytes = retrieve_and_decrypt_document(version.document.storage_path, expected_sha256=version.document.sha256_hash)
-    if version.document.mime_type == "application/pdf":
+
+def _png_response(img: Image.Image) -> Response:
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    buf.seek(0)
+    return Response(content=buf.getvalue(), media_type="image/png")
+
+
+def _load_or_build_derived(document: Document, kind: str) -> Image.Image:
+    DERIVED_DIR.mkdir(parents=True, exist_ok=True)
+    preview_path = DERIVED_DIR / f"{document.id}_preview.png"
+    ela_path = DERIVED_DIR / f"{document.id}_ela.png"
+    target = preview_path if kind == "preview" else ela_path
+    if target.exists():
+        return Image.open(target).convert("RGB")
+
+    doc_bytes = retrieve_and_decrypt_document(document.storage_path, expected_sha256=document.sha256_hash)
+    if document.mime_type == "application/pdf":
         imgs = pdf_bytes_to_images(doc_bytes, dpi=150)
         base_img = imgs[0] if imgs else Image.new("RGB", (600, 800), "white")
     else:
         base_img = Image.open(io.BytesIO(doc_bytes)).convert("RGB")
 
-    heatmap, _ = compute_ela_heatmap(base_img)
-    buf = io.BytesIO()
-    heatmap.save(buf, format="PNG")
-    buf.seek(0)
+    heatmap = render_ela_heatmap(base_img)
+    if not preview_path.exists():
+        base_img.save(preview_path, format="PNG")
+    if not ela_path.exists():
+        heatmap.save(ela_path, format="PNG")
+    return Image.open(target).convert("RGB")
 
-    return Response(content=buf.getvalue(), media_type="image/png")
+
+@router.get("/cases/{case_id}/ela-heatmap")
+@router.get("/cases/{case_id}/ela")
+def get_ela_heatmap_image(
+    case_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Returns PNG image bytes of Error Level Analysis (ELA) heatmap for the FDR document."""
+    document = _case_document_or_404(case_id, current_user, db)
+    return _png_response(_load_or_build_derived(document, "ela"))
 
 
 @router.get("/cases/{case_id}/document")
@@ -262,29 +287,7 @@ def get_fdr_preview_image(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """
-    Returns PNG image bytes of page 1 of the FDR document for inline preview.
-    """
-    case = db.query(FDRCase).filter(FDRCase.id == case_id).first()
-    if not case or not case.versions:
-        raise HTTPException(status_code=404, detail="FDR Case not found")
-
-    if current_user.role == UserRole.INSTITUTION and case.institution_id != current_user.institution_id:
-        raise HTTPException(status_code=403, detail="Forbidden")
-
-    version = next((v for v in case.versions if v.id == case.current_version_id), case.versions[0])
-    if not version.document:
-        raise HTTPException(status_code=404, detail="No document found")
-
-    doc_bytes = retrieve_and_decrypt_document(version.document.storage_path, expected_sha256=version.document.sha256_hash)
-    if version.document.mime_type == "application/pdf":
-        imgs = pdf_bytes_to_images(doc_bytes, dpi=150)
-        base_img = imgs[0] if imgs else Image.new("RGB", (600, 800), "white")
-    else:
-        base_img = Image.open(io.BytesIO(doc_bytes)).convert("RGB")
-
-    buf = io.BytesIO()
-    base_img.save(buf, format="PNG")
-    buf.seek(0)
-    return Response(content=buf.getvalue(), media_type="image/png")
+    """Returns PNG image bytes of page 1 of the FDR document for inline preview."""
+    document = _case_document_or_404(case_id, current_user, db)
+    return _png_response(_load_or_build_derived(document, "preview"))
 

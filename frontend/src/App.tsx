@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
 import { DemoClockModal } from './components/DemoClockModal';
@@ -44,13 +44,17 @@ const RootRedirect: React.FC = () => {
 export const AppContent: React.FC = () => {
   const [isDemoClockOpen, setIsDemoClockOpen] = useState(false);
   const [isAskSentinelOpen, setIsAskSentinelOpen] = useState(false);
+  const location = useLocation();
+  const isLogin = location.pathname === '/login';
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col text-slate-100">
-      <Navbar
-        onOpenDemoClock={() => setIsDemoClockOpen(true)}
-        onOpenAskSentinel={() => setIsAskSentinelOpen(true)}
-      />
+    <div className="min-h-screen bg-bg flex flex-col text-ink">
+      {!isLogin && (
+        <Navbar
+          onOpenDemoClock={() => setIsDemoClockOpen(true)}
+          onOpenAskSentinel={() => setIsAskSentinelOpen(true)}
+        />
+      )}
 
       <main className="flex-1">
         <ErrorBoundary>
@@ -127,15 +131,13 @@ export const AppContent: React.FC = () => {
         onClose={() => setIsAskSentinelOpen(false)}
       />
 
-      {/* Footer */}
-      <footer className="border-t border-slate-900 bg-slate-950 py-6 text-center text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>AICTE Security Deposit Verification Portal &bull; SIH 2026 Problem Statement SIH26265</span>
-          <span className="font-mono text-[11px] text-slate-400">
-            *Evaluated on synthetic dataset generated with fixed seed=42 &bull; No hardcoded metrics
-          </span>
-        </div>
-      </footer>
+      {!isLogin && (
+        <footer className="border-t border-soft bg-surface py-4 text-[15px] text-muted">
+          <div className="app-shell px-4 text-left">
+            FDR-Sentinel
+          </div>
+        </footer>
+      )}
     </div>
   );
 };
